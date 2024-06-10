@@ -1,4 +1,5 @@
 from flask import Flask, request, abort
+import interact_api,json,os,re
 
 from linebot import (
     LineBotApi, WebhookHandler
@@ -17,13 +18,17 @@ import traceback
 #======python的函數庫==========
 
 app = Flask(__name__)
+tokenizer, model, args=interact_api.runs()
+users=[]
+responds=[]
+
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 # Channel Access Token
 line_bot_api = LineBotApi(os.getenv('CHANNEL_ACCESS_TOKEN'))
 # Channel Secret
 handler = WebhookHandler(os.getenv('CHANNEL_SECRET'))
 # OPENAI API Key初始化設定
-openai.api_key = os.getenv('OPENAI_API_KEY')
+#openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 def GPT_response(text):
@@ -57,7 +62,8 @@ def handle_message(event):
     msg = event.message.text
     try:
         #GPT_answer = GPT_response(msg)
-        GPT_answer = msg
+        GPT_answer=interact_api.runfirst(msg, tokenizer, model, args)
+        #GPT_answer = msg
         print(GPT_answer)
         line_bot_api.reply_message(event.reply_token, TextSendMessage(GPT_answer))
     except:
